@@ -55,7 +55,7 @@ public class FBPMojo extends AbstractMojo {
                 pw.println("\t<SrcDir>" + srcRoot + "</SrcDir>");
             }
 
-            pw.println("<Project>");
+            pw.println("</Project>");
 
         } catch (
 
