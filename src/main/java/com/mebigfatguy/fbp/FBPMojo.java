@@ -31,17 +31,18 @@ public class FBPMojo extends AbstractMojo {
 
             pw.println("<Project projectName=\"" + project.getName() + "\">");
 
-            pw.println("<Jar>" + project.getBuild().getDirectory() + "</Jar>");
+            pw.println("\t<Jar>" + project.getBuild().getOutputDirectory() + "</Jar>");
 
             List<Dependency> dependencies = project.getCompileDependencies();
             for (Dependency dependency : dependencies) {
-                pw.println(dependency.getGroupId().replace('.', '/') + "/" + dependency.getArtifactId() + "/" + dependency.getVersion() + "/"
-                        + dependency.getArtifactId() + "-" + dependency.getVersion() + "." + dependency.getType());
+                pw.println(
+                        "\t<AuxClasspathEntry>" + dependency.getGroupId().replace('.', '/') + "/" + dependency.getArtifactId() + "/" + dependency.getVersion()
+                                + "/" + dependency.getArtifactId() + "-" + dependency.getVersion() + "." + dependency.getType() + "</AuxClasspathEntry>");
             }
 
             List<String> srcRoots = project.getCompileSourceRoots();
             for (String srcRoot : srcRoots) {
-                pw.println("<SrcDir>" + srcRoot + "</SrcDir>");
+                pw.println("\t<SrcDir>" + srcRoot + "</SrcDir>");
             }
 
             pw.println("<Project>");
