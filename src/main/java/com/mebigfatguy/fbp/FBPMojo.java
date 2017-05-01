@@ -14,9 +14,13 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Settings;
 
 @Mojo(name = "fbp", requiresDependencyResolution = ResolutionScope.COMPILE, threadSafe = true)
 public class FBPMojo extends AbstractMojo {
+
+    @Parameter(defaultValue = "${settings}", readonly = true, required = true)
+    private Settings settings;
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     MavenProject project;
@@ -34,10 +38,16 @@ public class FBPMojo extends AbstractMojo {
             pw.println("\t<Jar>" + project.getBuild().getOutputDirectory() + "</Jar>");
 
             List<Dependency> dependencies = project.getCompileDependencies();
+
+            String localRepo = settings.getLocalRepository();
+            if (!localRepo.endsWith("/") && !localRepo.endsWith("\\")) {
+                localRepo += "/";
+            }
+
             for (Dependency dependency : dependencies) {
-                pw.println(
-                        "\t<AuxClasspathEntry>" + dependency.getGroupId().replace('.', '/') + "/" + dependency.getArtifactId() + "/" + dependency.getVersion()
-                                + "/" + dependency.getArtifactId() + "-" + dependency.getVersion() + "." + dependency.getType() + "</AuxClasspathEntry>");
+                pw.println("\t<AuxClasspathEntry>" + localRepo + dependency.getGroupId().replace('.', '/') + "/" + dependency.getArtifactId() + "/"
+                        + dependency.getVersion() + "/" + dependency.getArtifactId() + "-" + dependency.getVersion() + "." + dependency.getType()
+                        + "</AuxClasspathEntry>");
             }
 
             List<String> srcRoots = project.getCompileSourceRoots();
@@ -47,7 +57,9 @@ public class FBPMojo extends AbstractMojo {
 
             pw.println("<Project>");
 
-        } catch (IOException e) {
+        } catch (
+
+        IOException e) {
             throw new MojoExecutionException("Failed to generate fbp file", e);
         }
     }
