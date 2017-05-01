@@ -2,6 +2,7 @@ package com.mebigfatguy.fbp;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.List;
@@ -9,21 +10,24 @@ import java.util.List;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
+@Mojo(name = "fbp", requiresDependencyResolution = ResolutionScope.COMPILE, threadSafe = true)
 public class FBPMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     MavenProject project;
 
-    @Parameter
-    private File fbpFile;
+    @Parameter(property = "outputFile")
+    private File outputFile;
 
     @Override
     public void execute() throws MojoExecutionException {
 
-        try (PrintWriter pw = new PrintWriter(Files.newBufferedWriter(fbpFile.toPath()))) {
+        try (PrintWriter pw = getFBPStream()) {
 
             pw.println("<Project projectName=\"" + project.getName() + "\">");
 
@@ -45,5 +49,13 @@ public class FBPMojo extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException("Failed to generate fbp file", e);
         }
+    }
+
+    private PrintWriter getFBPStream() throws IOException {
+        if (outputFile == null) {
+            return new PrintWriter(new OutputStreamWriter(System.out));
+        }
+
+        return new PrintWriter(Files.newBufferedWriter(outputFile.toPath()));
     }
 }
