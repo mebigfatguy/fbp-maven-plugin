@@ -9,6 +9,7 @@
 	<name>fbp-maven-plugin Maven Mojo</name>
 	<description>A maven plugin for generating FindBugs *.fbp files from a pom</description>
 	<url>http://maven.apache.org</url>
+	<inceptionYear>2017</inceptionYear>
 
 	<developers>
 		<developer>
