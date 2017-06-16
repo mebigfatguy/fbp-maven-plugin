@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
@@ -25,6 +27,9 @@ public class FBPMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     MavenProject project;
 
+    @Parameter(property = "reactorProjects", readonly = true, required = true)
+    private List<MavenProject> reactorProjects;
+
     @Parameter(property = "outputFile")
     private File outputFile;
 
@@ -34,10 +39,17 @@ public class FBPMojo extends AbstractMojo {
         try (PrintWriter pw = getFBPStream()) {
 
             pw.println("<Project projectName=\"" + project.getName() + "\">");
-
             pw.println("\t<Jar>" + project.getBuild().getOutputDirectory() + "</Jar>");
+            for (MavenProject module : reactorProjects) {
+                pw.println("\t<Jar>" + module.getBuild().getOutputDirectory() + "</Jar>");
+            }
 
-            List<Dependency> dependencies = project.getCompileDependencies();
+            Set<Dependency> dependencies = new HashSet<>();
+            dependencies.addAll(project.getCompileDependencies());
+
+            for (MavenProject module : reactorProjects) {
+                dependencies.addAll(module.getCompileDependencies());
+            }
 
             String localRepo = settings.getLocalRepository();
             if (!localRepo.endsWith("/") && !localRepo.endsWith("\\")) {
@@ -50,16 +62,19 @@ public class FBPMojo extends AbstractMojo {
                         + "</AuxClasspathEntry>");
             }
 
-            List<String> srcRoots = project.getCompileSourceRoots();
+            Set<String> srcRoots = new HashSet<>();
+            srcRoots.addAll(project.getCompileSourceRoots());
+            for (MavenProject module : reactorProjects) {
+                srcRoots.addAll(module.getCompileSourceRoots());
+            }
+
             for (String srcRoot : srcRoots) {
                 pw.println("\t<SrcDir>" + srcRoot + "</SrcDir>");
             }
 
             pw.println("</Project>");
 
-        } catch (
-
-        IOException e) {
+        } catch (IOException e) {
             throw new MojoExecutionException("Failed to generate fbp file", e);
         }
     }
