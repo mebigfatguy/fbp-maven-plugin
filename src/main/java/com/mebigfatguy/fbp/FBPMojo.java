@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
@@ -21,6 +21,8 @@ import org.apache.maven.settings.Settings;
 
 @Mojo(name = "fbp", requiresDependencyResolution = ResolutionScope.COMPILE, threadSafe = true)
 public class FBPMojo extends AbstractMojo {
+
+    private static boolean executed = false;
 
     @Parameter(defaultValue = "${settings}", readonly = true, required = true)
     private Settings settings;
@@ -37,14 +39,18 @@ public class FBPMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException {
 
+        if (executed) {
+            return;
+        }
+        executed = true;
+
         try (PrintWriter pw = getFBPStream()) {
 
             pw.println("<Project projectName=\"" + project.getName() + "\">");
 
             List<MavenProject> projects = session.getProjectDependencyGraph().getSortedProjects();
 
-            Set<String> jars = new HashSet<>();
-            jars.add(project.getBuild().getOutputDirectory());
+            Set<String> jars = new TreeSet<>();
             for (MavenProject module : projects) {
                 jars.add(module.getBuild().getOutputDirectory());
             }
@@ -53,10 +59,9 @@ public class FBPMojo extends AbstractMojo {
                 pw.println("\t<Jar>" + jar + "</Jar>");
             }
 
-            Set<Dependency> dependencies = new HashSet<>();
-            dependencies.addAll(project.getCompileDependencies());
+            Set<Dependency> dependencies = new TreeSet<>();
             for (MavenProject module : projects) {
-                dependencies.addAll(module.getCompileDependencies());
+                dependencies.addAll(module.getDependencies());
             }
 
             String localRepo = settings.getLocalRepository();
@@ -70,8 +75,7 @@ public class FBPMojo extends AbstractMojo {
                         + "</AuxClasspathEntry>");
             }
 
-            Set<String> srcRoots = new HashSet<>();
-            srcRoots.addAll(project.getCompileSourceRoots());
+            Set<String> srcRoots = new TreeSet<>();
             for (MavenProject module : projects) {
                 srcRoots.addAll(module.getCompileSourceRoots());
             }
