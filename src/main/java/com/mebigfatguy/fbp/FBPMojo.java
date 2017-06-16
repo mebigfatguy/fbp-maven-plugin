@@ -41,7 +41,7 @@ public class FBPMojo extends AbstractMojo {
 
             pw.println("<Project projectName=\"" + project.getName() + "\">");
 
-            List<MavenProject> projects = session.getProjectDependencyGraph().getAllProjects();
+            List<MavenProject> projects = session.getProjectDependencyGraph().getSortedProjects();
 
             Set<String> jars = new HashSet<>();
             jars.add(project.getBuild().getOutputDirectory());
