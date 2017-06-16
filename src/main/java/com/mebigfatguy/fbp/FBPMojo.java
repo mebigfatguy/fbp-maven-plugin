@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,10 +26,10 @@ public class FBPMojo extends AbstractMojo {
     private Settings settings;
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
-    MavenProject project;
+    private MavenProject project;
 
-    @Parameter(property = "reactorProjects", readonly = true, required = true)
-    private List<MavenProject> reactorProjects;
+    @Parameter(property = "session", readonly = true, required = true)
+    private MavenSession session;
 
     @Parameter(property = "outputFile")
     private File outputFile;
@@ -40,9 +41,11 @@ public class FBPMojo extends AbstractMojo {
 
             pw.println("<Project projectName=\"" + project.getName() + "\">");
 
+            List<MavenProject> projects = session.getProjectDependencyGraph().getAllProjects();
+
             Set<String> jars = new HashSet<>();
             jars.add(project.getBuild().getOutputDirectory());
-            for (MavenProject module : reactorProjects) {
+            for (MavenProject module : projects) {
                 jars.add(module.getBuild().getOutputDirectory());
             }
 
@@ -52,7 +55,7 @@ public class FBPMojo extends AbstractMojo {
 
             Set<Dependency> dependencies = new HashSet<>();
             dependencies.addAll(project.getCompileDependencies());
-            for (MavenProject module : reactorProjects) {
+            for (MavenProject module : projects) {
                 dependencies.addAll(module.getCompileDependencies());
             }
 
@@ -69,7 +72,7 @@ public class FBPMojo extends AbstractMojo {
 
             Set<String> srcRoots = new HashSet<>();
             srcRoots.addAll(project.getCompileSourceRoots());
-            for (MavenProject module : reactorProjects) {
+            for (MavenProject module : projects) {
                 srcRoots.addAll(module.getCompileSourceRoots());
             }
 
