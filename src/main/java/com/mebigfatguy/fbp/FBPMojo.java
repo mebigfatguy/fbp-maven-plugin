@@ -39,14 +39,19 @@ public class FBPMojo extends AbstractMojo {
         try (PrintWriter pw = getFBPStream()) {
 
             pw.println("<Project projectName=\"" + project.getName() + "\">");
-            pw.println("\t<Jar>" + project.getBuild().getOutputDirectory() + "</Jar>");
+
+            Set<String> jars = new HashSet<>();
+            jars.add(project.getBuild().getOutputDirectory());
             for (MavenProject module : reactorProjects) {
-                pw.println("\t<Jar>" + module.getBuild().getOutputDirectory() + "</Jar>");
+                jars.add(module.getBuild().getOutputDirectory());
+            }
+
+            for (String jar : jars) {
+                pw.println("\t<Jar>" + jar + "</Jar>");
             }
 
             Set<Dependency> dependencies = new HashSet<>();
             dependencies.addAll(project.getCompileDependencies());
-
             for (MavenProject module : reactorProjects) {
                 dependencies.addAll(module.getCompileDependencies());
             }
