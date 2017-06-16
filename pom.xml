@@ -18,6 +18,13 @@
 			<email>dbrosius@mebigfatguy.com</email>
 		</developer>
 	</developers>
+	
+	<contributors>
+		<contributor>
+			<name>Karl-Heinz Marbaise</name>
+			<email>info@soebes.de</email>
+		</contributor>
+	</contributors>
 
 	<licenses>
 		<license>
