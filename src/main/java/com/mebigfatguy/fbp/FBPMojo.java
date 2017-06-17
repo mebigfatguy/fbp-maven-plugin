@@ -56,7 +56,7 @@ public class FBPMojo extends AbstractMojo {
             }
 
             for (String jar : jars) {
-                pw.println("\t<Jar>" + jar + "</Jar>");
+                pw.println("\t<Jar>" + makeRelativePath(jar) + "</Jar>");
             }
 
             Set<Dependency> dependencies = new TreeSet<>();
@@ -81,7 +81,7 @@ public class FBPMojo extends AbstractMojo {
             }
 
             for (String srcRoot : srcRoots) {
-                pw.println("\t<SrcDir>" + srcRoot + "</SrcDir>");
+                pw.println("\t<SrcDir>" + makeRelativePath(srcRoot) + "</SrcDir>");
             }
 
             pw.println("</Project>");
@@ -98,4 +98,19 @@ public class FBPMojo extends AbstractMojo {
 
         return new PrintWriter(Files.newBufferedWriter(outputFile.toPath()));
     }
+
+    private String makeRelativePath(String path) {
+        if (outputFile == null) {
+            return path;
+        }
+
+        String outputPath = outputFile.getParent();
+
+        if (path.startsWith(outputPath)) {
+            return "." + path.substring(outputPath.length());
+        }
+
+        return path;
+    }
+
 }
