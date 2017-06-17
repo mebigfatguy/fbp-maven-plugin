@@ -10,3 +10,10 @@ To use:
 	 </pluginGroups>
 ```
 1. run mvn fbp:fbp
+
+
+### Available at maven central with coordinates ###
+
+         GroupId: com.mebigfatguy.fbp-maven-plugin
+      ArtifactId: fbp-maven-plugin
+         Version: 0.4.1
