@@ -59,7 +59,7 @@ public class FBPMojo extends AbstractMojo {
                 pw.println("\t<Jar>" + makeRelativePath(jar) + "</Jar>");
             }
 
-            Set<Dependency> dependencies = new TreeSet<>();
+            Set<Dependency> dependencies = new TreeSet<>(new DependencyComparator());
             for (MavenProject module : projects) {
                 dependencies.addAll(module.getDependencies());
             }
