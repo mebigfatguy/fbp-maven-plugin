@@ -15,5 +15,5 @@ To use:
 ### Available at maven central with coordinates ###
 
          GroupId: com.mebigfatguy.fbp-maven-plugin
-      ArtifactId: fbp-maven-plugin
-         Version: 0.4.1
+        ArtifactId: fbp-maven-plugin
+           Version: 0.4.1
