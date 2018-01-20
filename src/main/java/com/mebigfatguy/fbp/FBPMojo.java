@@ -1,6 +1,6 @@
 /** fbp-maven-plugin - a FindBugs Project file generation tool for maven
- * Copyright 2017 MeBigFatGuy.com
- * Copyright 2017 Dave Brosius
+ * Copyright 2017-2018 MeBigFatGuy.com
+ * Copyright 2017-2018 Dave Brosius
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
